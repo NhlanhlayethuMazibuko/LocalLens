@@ -4,14 +4,6 @@
 
 LocalLens is a responsive web app for discovering restaurants, hotels and attractions nearby. A live map and a ranked list work side by side: tap a pin or a card and you get everything you need to decide, from photos and reviews to opening hours and directions.
 
-<!--
-  Add screenshots here once you've taken them, for example:
-  ![LocalLens on desktop](docs/desktop.png)
-  ![LocalLens on mobile](docs/mobile.png)
--->
-
----
-
 ## The problem
 
 Finding somewhere good to eat, stay or visit usually means juggling a maps app, review sites and search results, and most travel sites are cluttered with ads and sponsored listings. It's hard to see, at a glance, which highly rated place is actually close by and open right now.
@@ -113,16 +105,6 @@ src/
   index.css            design tokens (colours, spacing, type) for light and dark
   App.css              layout, components, mobile styles
 ```
-
----
-
-## What I'd build next
-
-- A **Saved places** screen (favourites are already stored)
-- An **Open now** filter
-- **Shareable links** to a place or search area
-- **Tests** for the data normalisation and hooks
-- **Deploying** to a public URL
 
 ---
 

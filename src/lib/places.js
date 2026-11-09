@@ -75,6 +75,34 @@ export function distanceKm(a, b) {
   return 6371 * 2 * Math.asin(Math.sqrt(h));
 }
 
+const MINUTES_IN_DAY = 24 * 60;
+const MINUTES_IN_WEEK = 7 * MINUTES_IN_DAY;
+const minuteOfWeek = ({ day, hour, minute }) => day * MINUTES_IN_DAY + hour * 60 + minute;
+
+// true = open, false = closed, null = we don't know the hours.
+// Uses the place's own time zone, so it's right even when you browse another city.
+export function isOpenNow(place, now = new Date()) {
+  const { periods, utcOffset } = place.openingHours ?? {};
+  if (!periods?.length) return null;
+
+  const offset = utcOffset ?? -now.getTimezoneOffset();
+  const local = new Date(now.getTime() + offset * 60000);
+  const current = minuteOfWeek({
+    day: local.getUTCDay(),
+    hour: local.getUTCHours(),
+    minute: local.getUTCMinutes(),
+  });
+
+  return periods.some(({ open, close }) => {
+    if (!open) return false;
+    if (!close) return true; // open 24 hours
+    const start = minuteOfWeek(open);
+    let end = minuteOfWeek(close);
+    if (end <= start) end += MINUTES_IN_WEEK; // e.g. Saturday night to Sunday morning
+    return [current, current + MINUTES_IN_WEEK].some((t) => t >= start && t < end);
+  });
+}
+
 export function formatDistance(km) {
   if (km == null) return '';
   return km < 1 ? `${Math.round(km * 1000)} m away` : `${km.toFixed(1)} km away`;

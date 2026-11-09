@@ -14,7 +14,15 @@ const SORTS = [
 
 const SORTS_WITH_RATING = [['rating', 'Top rated'], ...SORTS];
 
-export default function Filters({ type, sort, hasRatings, onTypeChange, onSortChange }) {
+export default function Filters({
+  type,
+  sort,
+  hasRatings,
+  openNow,
+  onTypeChange,
+  onSortChange,
+  onOpenNowChange,
+}) {
   return (
     <div className="filters">
       <Select label="Type" value={type} options={TYPES} onChange={onTypeChange} />
@@ -24,6 +32,17 @@ export default function Filters({ type, sort, hasRatings, onTypeChange, onSortCh
         options={hasRatings ? SORTS_WITH_RATING : SORTS}
         onChange={onSortChange}
       />
+      {hasRatings && (
+        <button
+          type="button"
+          className="toggle"
+          aria-pressed={openNow}
+          onClick={() => onOpenNowChange(!openNow)}
+        >
+          <span className="toggle__dot" aria-hidden="true" />
+          Open now
+        </button>
+      )}
     </div>
   );
 }

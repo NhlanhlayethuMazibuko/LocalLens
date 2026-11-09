@@ -53,7 +53,40 @@
 
 .filters {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   gap: var(--space-12);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 38px;
+  padding: 0 var(--space-12);
+  font-weight: 500;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+}
+
+.toggle__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--text-muted);
+}
+
+.toggle[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.toggle[aria-pressed='true'] .toggle__dot {
+  border-color: var(--primary);
+  background: var(--primary);
 }
 
 .select {

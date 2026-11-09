@@ -5,7 +5,7 @@ const MESSAGES = {
   busy: 'The map servers are having a moment. Give them a few seconds.',
   error: "Can't reach the internet right now. Check your connection.",
   setup:
-    "Google couldn't load places. Check that your API key and the Places API are set up (see SETUP-GOOGLE.md).",
+    "Google couldn't load places. Check that your API key and the Places API are set up (see the README).",
 };
 
 // The first card gets a big spot, depending on how the list is sorted.
@@ -14,7 +14,7 @@ const BADGES = {
   distance: 'Closest to you',
 };
 
-export default function PlaceList({ places, status, sort, onRetry, onSelect }) {
+export default function PlaceList({ places, status, sort, openNow, onRetry, onSelect }) {
   if (MESSAGES[status]) {
     return (
       <div className="list-message">
@@ -43,7 +43,11 @@ export default function PlaceList({ places, status, sort, onRetry, onSelect }) {
   if (places.length === 0) {
     return (
       <div className="list-message">
-        <p>Crickets. Nudge the map around or try another type.</p>
+        <p>
+          {openNow
+            ? 'Everything here is closed right now. Turn off Open now or try another area.'
+            : 'Crickets. Nudge the map around or try another type.'}
+        </p>
       </div>
     );
   }

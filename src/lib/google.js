@@ -17,6 +17,7 @@ const LIST_FIELDS = [
   'userRatingCount',
   'priceLevel',
   'regularOpeningHours',
+  'utcOffsetMinutes',
   'photos',
 ];
 
@@ -38,6 +39,16 @@ function todaysHours(weekdayDescriptions) {
   return line.replace(/^[^:]+:\s*/, 'Today: ');
 }
 
+function openingHours(gp) {
+  const periods = gp.regularOpeningHours?.periods;
+  if (!periods?.length) return null;
+  const point = (p) => (p ? { day: p.day, hour: p.hour, minute: p.minute } : null);
+  return {
+    periods: periods.map((p) => ({ open: point(p.open), close: point(p.close) })),
+    utcOffset: gp.utcOffsetMinutes ?? null,
+  };
+}
+
 function credit(photo) {
   const author = photo?.authorAttributions?.[0];
   return author ? { name: author.displayName, url: author.uri } : null;
@@ -56,6 +67,7 @@ function fromGoogle(gp) {
     address: gp.shortFormattedAddress ?? '',
     hours: todaysHours(gp.regularOpeningHours?.weekdayDescriptions),
     allHours: gp.regularOpeningHours?.weekdayDescriptions?.join('\n') ?? null,
+    openingHours: openingHours(gp),
     rating: gp.rating ?? null,
     reviewCount: gp.userRatingCount ?? 0,
     price: PRICE[gp.priceLevel] ?? null,

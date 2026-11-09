@@ -17,7 +17,7 @@ import {
   useWeather,
 } from './lib/hooks.js';
 import { USE_GOOGLE } from './lib/config.js';
-import { distanceKm } from './lib/places.js';
+import { distanceKm, isOpenNow } from './lib/places.js';
 import './App.css';
 
 const usePlaces = USE_GOOGLE ? useGooglePlaces : useOsmPlaces;
@@ -42,6 +42,7 @@ export default function App() {
   const [theme, toggleTheme] = useTheme();
   const [type, setType] = useState('restaurants');
   const [sort, setSort] = useState(USE_GOOGLE ? 'rating' : 'distance');
+  const [openNow, setOpenNow] = useState(false);
   const [view, setView] = useState(null);
   const [origin, setOrigin] = useState(DEFAULT_CENTER);
   const [flyTarget, setFlyTarget] = useState(null);
@@ -69,9 +70,10 @@ export default function App() {
   }, [selected]);
 
   const sortedPlaces = useMemo(() => {
-    const withDistance = places.map((place) => ({ ...place, distance: distanceKm(origin, place) }));
+    const shown = openNow ? places.filter((place) => isOpenNow(place) === true) : places;
+    const withDistance = shown.map((place) => ({ ...place, distance: distanceKm(origin, place) }));
     return withDistance.sort(SORTERS[sort]);
-  }, [places, origin, sort]);
+  }, [places, origin, sort, openNow]);
 
   function selectPlace(place) {
     setSelected(place);
@@ -104,13 +106,16 @@ export default function App() {
                 type={type}
                 sort={sort}
                 hasRatings={USE_GOOGLE}
+                openNow={openNow}
                 onTypeChange={setType}
                 onSortChange={setSort}
+                onOpenNowChange={setOpenNow}
               />
               <PlaceList
                 places={sortedPlaces}
                 status={status}
                 sort={sort}
+                openNow={openNow}
                 onRetry={retry}
                 onSelect={selectPlace}
               />
