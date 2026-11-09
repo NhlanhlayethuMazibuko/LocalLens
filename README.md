@@ -87,31 +87,9 @@ Open http://localhost:5173.
 
 4. Restart `npm run dev`.
 
----
-
-## Project structure
-
-```
-src/
-  App.jsx              screen layout and app state
-  components/          Header, Filters, PlaceList, PlaceCard, PlaceDetails,
-                       GoogleMapView, MapView (Leaflet), Stars, WeatherBadge, Icons
-  lib/
-    api.js             OpenStreetMap places, city search, weather
-    google.js          Google Places search, details, photos, reviews
-    hooks.js           usePlaces, usePlaceDetails, useWeather, useTheme, useSavedPlaces
-    places.js          data normalisation and distance maths
-    config.js          reads the API key and chooses the data source
-  index.css            design tokens (colours, spacing, type) for light and dark
-  App.css              layout, components, mobile styles
-```
-
----
 
 ## About
 
-Designed and built by **Nhlanhla Mazibuko**. The project started from a tutorial-style "Travel Advisor" app that needed paid APIs to run. I redesigned it from scratch in Figma and rebuilt it with a new data layer, a free fallback mode and a responsive UI.
+Designed and built by **Nhlanhla Mazibuko**. Built with AI pair-programming (Claude) as a learning project. I directed the product and design decisions and reviewed and tested the code.
 
-Built with AI pair-programming (Claude) as a learning project. I directed the product and design decisions and reviewed and tested the code.
 
-[GitHub](https://github.com/NhlanhlayethuMazibuko)
