@@ -14,6 +14,7 @@ import {
   useOsmPlaces,
   useSavedPlaces,
   useTheme,
+  useVisitedPlaces,
   useWeather,
 } from './lib/hooks.js';
 import { USE_GOOGLE } from './lib/config.js';
@@ -30,6 +31,17 @@ const TITLES = {
   restaurants: "Hungry? Here's the good stuff.",
   hotels: 'Somewhere to crash tonight',
   attractions: 'Worth leaving the house for',
+};
+
+const MY_LISTS = {
+  saved: {
+    title: 'Your little black book',
+    emptyText: "Nothing saved yet. Tap the heart on any place and it'll wait for you here.",
+  },
+  visited: {
+    title: 'Been there, done that',
+    emptyText: 'Nowhere ticked off yet. Open a place and tap Been here once you have gone.',
+  },
 };
 
 const SORTERS = {
@@ -51,7 +63,8 @@ export default function App() {
   const { places, status, retry, canSearchArea, searchArea } = usePlaces(type, view);
   const selectedDetails = usePlaceDetails(selected);
   const weather = useWeather(view?.center);
-  const { savedPlaces, isSaved, toggleSaved } = useSavedPlaces();
+  const { savedPlaces, isSaved, toggleSaved, removeSaved } = useSavedPlaces();
+  const { visitedPlaces, isVisited, addVisited, removeVisited } = useVisitedPlaces();
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -76,13 +89,26 @@ export default function App() {
     return withDistance.sort(SORTERS[sort]);
   }, [places, origin, sort, openNow]);
 
-  const savedWithDistance = useMemo(
-    () => savedPlaces.map((place) => ({ ...place, distance: distanceKm(origin, place) })),
-    [savedPlaces, origin],
-  );
+  const myList = useMemo(() => {
+    const list = MY_LISTS[tab];
+    if (!list) return null;
+    const source = tab === 'saved' ? savedPlaces : visitedPlaces;
+    const places = source.map((place) => ({ ...place, distance: distanceKm(origin, place) }));
+    return { ...list, places };
+  }, [tab, savedPlaces, visitedPlaces, origin]);
 
-  const isSavedTab = tab === 'saved';
-  const shownPlaces = isSavedTab ? savedWithDistance : sortedPlaces;
+  const shownPlaces = myList ? myList.places : sortedPlaces;
+  const selectedVisit = selected && visitedPlaces.find((p) => p.id === selected.id);
+
+  // Ticking "Been here" moves a place from Saved to Visited.
+  function toggleVisited() {
+    if (isVisited(selected.id)) {
+      removeVisited(selected.id);
+    } else {
+      addVisited(selected);
+      removeSaved(selected.id);
+    }
+  }
 
   function selectPlace(place) {
     setSelected(place);
@@ -105,20 +131,26 @@ export default function App() {
             <PlaceDetails
               place={{ ...selectedDetails, distance: distanceKm(origin, selectedDetails) }}
               saved={isSaved(selected.id)}
+              visitedAt={selectedVisit?.visitedAt}
               onToggleSave={() => toggleSaved(selected)}
+              onToggleVisited={toggleVisited}
               onBack={() => setSelected(null)}
             />
           ) : (
             <>
-              <Tabs tab={tab} savedCount={savedPlaces.length} onChange={setTab} />
-              {isSavedTab ? (
+              <Tabs
+                tab={tab}
+                counts={{ saved: savedPlaces.length, visited: visitedPlaces.length }}
+                onChange={setTab}
+              />
+              {myList ? (
                 <>
-                  <h1 className="panel__title">Your little black book</h1>
+                  <h1 className="panel__title">{myList.title}</h1>
                   <PlaceList
-                    places={savedWithDistance}
+                    places={myList.places}
                     status="ready"
                     sort={null}
-                    emptyText="Nothing saved yet. Tap the heart on any place and it'll wait for you here."
+                    emptyText={myList.emptyText}
                     onSelect={selectPlace}
                   />
                 </>
@@ -158,7 +190,7 @@ export default function App() {
             flyTarget={flyTarget}
             theme={theme}
           />
-          {canSearchArea && !selected && !isSavedTab && (
+          {canSearchArea && !selected && !myList && (
             <button type="button" className="search-area" onClick={searchArea}>
               <SearchIcon size={16} /> Look around here
             </button>
@@ -170,28 +202,28 @@ export default function App() {
   );
 }
 
-function Tabs({ tab, savedCount, onChange }) {
+const TABS = [
+  ['explore', 'Explore'],
+  ['saved', 'Saved'],
+  ['visited', 'Been there'],
+];
+
+function Tabs({ tab, counts, onChange }) {
   return (
     <div className="tabs" role="tablist" aria-label="What to show">
-      <button
-        type="button"
-        role="tab"
-        className="tabs__tab"
-        aria-selected={tab === 'explore'}
-        onClick={() => onChange('explore')}
-      >
-        Explore
-      </button>
-      <button
-        type="button"
-        role="tab"
-        className="tabs__tab"
-        aria-selected={tab === 'saved'}
-        onClick={() => onChange('saved')}
-      >
-        Saved
-        {savedCount > 0 && <span className="tabs__count">{savedCount}</span>}
-      </button>
+      {TABS.map(([value, label]) => (
+        <button
+          key={value}
+          type="button"
+          role="tab"
+          className="tabs__tab"
+          aria-selected={tab === value}
+          onClick={() => onChange(value)}
+        >
+          {label}
+          {counts[value] > 0 && <span className="tabs__count">{counts[value]}</span>}
+        </button>
+      ))}
     </div>
   );
 }

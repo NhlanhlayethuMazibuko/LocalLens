@@ -170,32 +170,54 @@ export function useTheme() {
   return [theme, toggleTheme];
 }
 
-export function useSavedPlaces() {
-  // Newest first. Each entry is a copy of the place, so the Saved list works
-  // even after you've moved the map somewhere else.
-  const [saved, setSaved] = useState(() => readStorage(SAVED_KEY, []));
+// A list of places remembered in the browser, newest first. Each entry is a
+// copy of the place, so the list still works after the map has moved on.
+function usePlaceList(storageKey) {
+  const [list, setList] = useState(() => readStorage(storageKey, []));
 
-  const toggleSaved = useCallback((place) => {
-    setSaved((previous) => {
-      const next = previous.some((p) => p.id === place.id)
-        ? previous.filter((p) => p.id !== place.id)
-        : [toSnapshot(place), ...previous];
-      writeStorage(SAVED_KEY, next);
-      return next;
-    });
-  }, []);
+  const update = useCallback(
+    (change) =>
+      setList((previous) => {
+        const next = change(previous);
+        writeStorage(storageKey, next);
+        return next;
+      }),
+    [storageKey],
+  );
 
-  const savedPlaces = useMemo(() => saved.map(withTodaysHours), [saved]);
-  const isSaved = useCallback((id) => saved.some((p) => p.id === id), [saved]);
+  const add = useCallback(
+    (place, extra) =>
+      update((previous) => [
+        { ...toSnapshot(place), ...extra },
+        ...previous.filter((p) => p.id !== place.id),
+      ]),
+    [update],
+  );
+  const remove = useCallback((id) => update((previous) => previous.filter((p) => p.id !== id)), [update]);
+  const has = useCallback((id) => list.some((p) => p.id === id), [list]);
+  const places = useMemo(() => list.map(withTodaysHours), [list]);
 
-  return { savedPlaces, isSaved, toggleSaved };
+  return { places, has, add, remove };
 }
 
-const SAVED_KEY = 'saved-places-v2';
+export function useSavedPlaces() {
+  const { places, has, add, remove } = usePlaceList('saved-places-v2');
+  const toggleSaved = useCallback(
+    (place) => (has(place.id) ? remove(place.id) : add(place)),
+    [has, add, remove],
+  );
+  return { savedPlaces: places, isSaved: has, toggleSaved, removeSaved: remove };
+}
+
+export function useVisitedPlaces() {
+  const { places, has, add, remove } = usePlaceList('visited-places');
+  const addVisited = useCallback((place) => add(place, { visitedAt: new Date().toISOString() }), [add]);
+  return { visitedPlaces: places, isVisited: has, addVisited, removeVisited: remove };
+}
 
 // Keep only plain data that can be stored as JSON.
 function toSnapshot(place) {
-  const { googlePlace, distance, detailsLoaded, failed, reviews, ...rest } = place;
+  const { googlePlace, distance, detailsLoaded, failed, reviews, visitedAt, ...rest } = place;
   return rest;
 }
 

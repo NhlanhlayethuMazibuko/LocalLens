@@ -69,6 +69,12 @@ export const HeartIcon = ({ filled, ...p }) => (
   </Icon>
 );
 
+export const CheckIcon = (p) => (
+  <Icon {...p}>
+    <path d="M5 12.5l4.5 4.5L19 7.5" />
+  </Icon>
+);
+
 export const SunIcon = (p) => (
   <Icon {...p}>
     <circle cx="12" cy="12" r="4" />

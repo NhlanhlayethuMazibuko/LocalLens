@@ -1,7 +1,7 @@
-import { ChevronLeftIcon, ClockIcon, GlobeIcon, HeartIcon, PhoneIcon, PinIcon } from './Icons.jsx';
+import { CheckIcon, ChevronLeftIcon, ClockIcon, GlobeIcon, HeartIcon, PhoneIcon, PinIcon } from './Icons.jsx';
 import { PlacePhoto, RatingLine } from './PlaceCard.jsx';
 import Stars from './Stars.jsx';
-import { formatDistance } from '../lib/places.js';
+import { formatDistance, formatVisitDate } from '../lib/places.js';
 
 function InfoRow({ icon, label, value, href }) {
   return (
@@ -51,7 +51,7 @@ function Review({ review }) {
   );
 }
 
-export default function PlaceDetails({ place, saved, onToggleSave, onBack }) {
+export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, onToggleVisited, onBack }) {
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
   const subtitle = [
     place.category,
@@ -113,6 +113,17 @@ export default function PlaceDetails({ place, saved, onToggleSave, onBack }) {
           <h2>{place.name}</h2>
           <RatingLine place={place} size={16} />
           <p className="muted">{subtitle}</p>
+          <button
+            type="button"
+            className="toggle details__visited"
+            aria-pressed={Boolean(visitedAt)}
+            onClick={onToggleVisited}
+          >
+            <span className="toggle__check" aria-hidden="true">
+              {visitedAt && <CheckIcon size={14} />}
+            </span>
+            {visitedAt ? `Been here · ${formatVisitDate(visitedAt)}` : 'Been here?'}
+          </button>
           {place.chips.length > 0 && (
             <div className="chips">
               {place.chips.map((chip) => (

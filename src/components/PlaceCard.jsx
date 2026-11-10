@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { NoPhotoIcon, PinIcon } from './Icons.jsx';
+import { CheckIcon, NoPhotoIcon, PinIcon } from './Icons.jsx';
 import Stars from './Stars.jsx';
-import { formatDistance } from '../lib/places.js';
+import { formatDistance, formatVisitDate } from '../lib/places.js';
 
 // Shimmers while the photo loads; says so plainly when there isn't one.
 export function PlacePhoto({ place, url, className = '' }) {
@@ -57,7 +57,13 @@ export default function PlaceCard({ place, onSelect, badge }) {
             <PinIcon /> {place.address}
           </span>
         )}
-        {place.hours && <span className="card__hours">{place.hours}</span>}
+        {place.visitedAt ? (
+          <span className="card__visited">
+            <CheckIcon size={14} /> Been here · {formatVisitDate(place.visitedAt)}
+          </span>
+        ) : (
+          place.hours && <span className="card__hours">{place.hours}</span>
+        )}
         {place.chips.length > 0 && (
           <span className="chips">
             {place.chips.map((chip) => (

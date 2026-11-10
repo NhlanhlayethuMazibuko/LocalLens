@@ -401,6 +401,35 @@
   color: var(--accent);
 }
 
+.card__visited {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.details__visited {
+  align-self: flex-start;
+}
+
+.toggle__check {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+}
+
+.toggle[aria-pressed='true'] .toggle__check {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--text-on-primary);
+}
+
 .card--skeleton:hover {
   border-color: var(--border);
   box-shadow: none;

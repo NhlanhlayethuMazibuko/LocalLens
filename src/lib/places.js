@@ -107,3 +107,9 @@ export function formatDistance(km) {
   if (km == null) return '';
   return km < 1 ? `${Math.round(km * 1000)} m away` : `${km.toFixed(1)} km away`;
 }
+
+// "10 Nov 2026"
+export function formatVisitDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+}
