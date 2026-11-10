@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import { fetchPlaces, fetchWeather } from './api.js';
-import { loadDetails, searchNearby, searchRadiusKm } from './google.js';
+import { loadDetails, searchNearby, searchRadiusKm, todaysHours } from './google.js';
 import { distanceKm } from './places.js';
 
 const MIN_ZOOM = 13;
@@ -105,7 +105,7 @@ export function useGoogleDetails(place) {
   const [extra, setExtra] = useState(null);
 
   useEffect(() => {
-    if (!place?.googlePlace) return;
+    if (!place) return;
     let cancelled = false;
     loadDetails(place)
       .then((details) => !cancelled && setExtra({ id: place.id, ...details }))
@@ -171,17 +171,36 @@ export function useTheme() {
 }
 
 export function useSavedPlaces() {
-  const [saved, setSaved] = useState(() => new Set(readStorage('saved-places', [])));
+  // Newest first. Each entry is a copy of the place, so the Saved list works
+  // even after you've moved the map somewhere else.
+  const [saved, setSaved] = useState(() => readStorage(SAVED_KEY, []));
 
-  const toggleSaved = useCallback((id) => {
+  const toggleSaved = useCallback((place) => {
     setSaved((previous) => {
-      const next = new Set(previous);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      writeStorage('saved-places', [...next]);
+      const next = previous.some((p) => p.id === place.id)
+        ? previous.filter((p) => p.id !== place.id)
+        : [toSnapshot(place), ...previous];
+      writeStorage(SAVED_KEY, next);
       return next;
     });
   }, []);
 
-  return { isSaved: (id) => saved.has(id), toggleSaved };
+  const savedPlaces = useMemo(() => saved.map(withTodaysHours), [saved]);
+  const isSaved = useCallback((id) => saved.some((p) => p.id === id), [saved]);
+
+  return { savedPlaces, isSaved, toggleSaved };
+}
+
+const SAVED_KEY = 'saved-places-v2';
+
+// Keep only plain data that can be stored as JSON.
+function toSnapshot(place) {
+  const { googlePlace, distance, detailsLoaded, failed, reviews, ...rest } = place;
+  return rest;
+}
+
+// "Today: ..." changes every day, so work it out again from the weekly hours.
+function withTodaysHours(place) {
+  if (!place.openingHours || !place.allHours) return place;
+  return { ...place, hours: todaysHours(place.allHours.split('\n')) };
 }

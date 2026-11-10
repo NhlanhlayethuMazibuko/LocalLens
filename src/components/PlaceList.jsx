@@ -14,7 +14,7 @@ const BADGES = {
   distance: 'Closest to you',
 };
 
-export default function PlaceList({ places, status, sort, openNow, onRetry, onSelect }) {
+export default function PlaceList({ places, status, sort, openNow, emptyText, onRetry, onSelect }) {
   if (MESSAGES[status]) {
     return (
       <div className="list-message">
@@ -44,9 +44,10 @@ export default function PlaceList({ places, status, sort, openNow, onRetry, onSe
     return (
       <div className="list-message">
         <p>
-          {openNow
-            ? 'Everything here is closed right now. Turn off Open now or try another area.'
-            : 'Crickets. Nudge the map around or try another type.'}
+          {emptyText ??
+            (openNow
+              ? 'Everything here is closed right now. Turn off Open now or try another area.'
+              : 'Crickets. Nudge the map around or try another type.')}
         </p>
       </div>
     );

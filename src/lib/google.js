@@ -33,7 +33,7 @@ const DETAIL_FIELDS = [
 
 const PRICE = { FREE: 'Free', INEXPENSIVE: '$', MODERATE: '$$', EXPENSIVE: '$$$', VERY_EXPENSIVE: '$$$$' };
 
-function todaysHours(weekdayDescriptions) {
+export function todaysHours(weekdayDescriptions) {
   if (!weekdayDescriptions?.length) return null;
   const line = weekdayDescriptions[(new Date().getDay() + 6) % 7] ?? '';
   return line.replace(/^[^:]+:\s*/, 'Today: ');
@@ -109,7 +109,11 @@ const detailsCache = new Map();
 
 export function loadDetails(place) {
   if (!detailsCache.has(place.id)) {
-    const request = place.googlePlace.fetchFields({ fields: DETAIL_FIELDS }).then(({ place: gp }) => {
+    // Saved places come back from storage without the Google object, so make a
+    // fresh one from the ID and ask for the photos as well.
+    const googlePlace = place.googlePlace ?? new google.maps.places.Place({ id: place.id });
+    const fields = place.googlePlace ? DETAIL_FIELDS : [...DETAIL_FIELDS, 'photos'];
+    const request = googlePlace.fetchFields({ fields }).then(({ place: gp }) => {
       const phone = gp.nationalPhoneNumber ?? gp.internationalPhoneNumber ?? null;
       const photo = gp.photos?.[0];
       return {
