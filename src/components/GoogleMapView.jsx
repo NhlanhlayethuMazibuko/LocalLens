@@ -1,15 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { AdvancedMarker, Map, useMap } from '@vis.gl/react-google-maps';
+import { CheckIcon } from './Icons.jsx';
 import { GOOGLE_MAP_ID } from '../lib/config.js';
 
-function Pin({ name, state }) {
+// A round pin. It shows the place's number in the list, or a tick on Been there.
+function Pin({ name, state, number, visited }) {
   return (
-    <div className={`pin pin--${state}`}>
+    <div className={`pin pin--${state}${visited ? ' pin--visited' : ''}`}>
+      {visited ? <CheckIcon size={14} strokeWidth={3} /> : (number ?? <span className="pin__dot" />)}
       <span className="pin__label">{name}</span>
-      <svg width="36" height="44" viewBox="0 0 36 44" aria-hidden="true">
-        <path className="pin__body" d="M18 43C18 43 33 28.5 33 17A15 15 0 0 0 3 17C3 28.5 18 43 18 43Z" />
-        <circle className="pin__dot" cx="18" cy="17" r="6" />
-      </svg>
     </div>
   );
 }
@@ -32,6 +31,7 @@ export default function GoogleMapView({
   onViewChange,
   flyTarget,
   theme,
+  visited,
 }) {
   const camera = useRef({ center: initialCenter, zoom: 15 });
 
@@ -68,7 +68,7 @@ export default function GoogleMapView({
     >
       <FlyTo target={flyTarget} />
 
-      {places.map((place) => (
+      {places.map((place, index) => (
         <AdvancedMarker
           key={place.id}
           position={{ lat: place.lat, lng: place.lng }}
@@ -76,7 +76,7 @@ export default function GoogleMapView({
           zIndex={selected?.id === place.id ? 1000 : undefined}
           onClick={() => onSelect(place)}
         >
-          <Pin name={place.name} state={stateOf(place)} />
+          <Pin name={place.name} state={stateOf(place)} number={index + 1} visited={visited} />
         </AdvancedMarker>
       ))}
 

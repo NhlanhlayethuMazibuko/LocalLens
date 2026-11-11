@@ -8,24 +8,48 @@ const MESSAGES = {
     "Google couldn't load places. Check that your API key and the Places API are set up (see the README).",
 };
 
-// The first card gets a big spot, depending on how the list is sorted.
+// The first card gets a big photo, depending on how the list is sorted.
 const BADGES = {
-  rating: 'Crowd favourite',
-  reviews: 'Most talked about',
+  rating: 'Top rated nearby',
+  reviews: 'Most reviewed nearby',
   distance: 'Closest to you',
 };
 
-export default function PlaceList({ places, status, sort, openNow, emptyText, onRetry, onSelect }) {
+export function EmptyState({ icon, title, text, action }) {
+  return (
+    <div className="empty">
+      {icon && <span className="empty__icon">{icon}</span>}
+      {title && <h2 className="empty__title">{title}</h2>}
+      <p className="empty__text">{text}</p>
+      {action}
+    </div>
+  );
+}
+
+export default function PlaceList({
+  places,
+  status,
+  sort,
+  openNow,
+  empty,
+  sortControl,
+  isSaved,
+  onToggleSave,
+  onRetry,
+  onSelect,
+}) {
   if (MESSAGES[status]) {
     return (
-      <div className="list-message">
-        <p>{MESSAGES[status]}</p>
-        {status !== 'zoom' && (
-          <button type="button" className="btn btn--secondary" onClick={onRetry}>
-            Try again
-          </button>
-        )}
-      </div>
+      <EmptyState
+        text={MESSAGES[status]}
+        action={
+          status !== 'zoom' && (
+            <button type="button" className="btn btn--secondary" onClick={onRetry}>
+              Try again
+            </button>
+          )
+        }
+      />
     );
   }
 
@@ -43,14 +67,15 @@ export default function PlaceList({ places, status, sort, openNow, emptyText, on
 
   if (places.length === 0) {
     return (
-      <div className="list-message">
-        <p>
-          {emptyText ??
-            (openNow
+      empty ?? (
+        <EmptyState
+          text={
+            openNow
               ? 'Everything here is closed right now. Turn off Open now or try another area.'
-              : 'Crickets. Nudge the map around or try another type.')}
-        </p>
-      </div>
+              : 'Crickets. Nudge the map around or try another type.'
+          }
+        />
+      )
     );
   }
 
@@ -58,13 +83,25 @@ export default function PlaceList({ places, status, sort, openNow, emptyText, on
 
   return (
     <>
-      <p className="list-count" aria-live="polite">
-        {places.length} {places.length === 1 ? 'spot' : 'spots'} on the map{isLoading && ' · refreshing…'}
-      </p>
+      <div className="list-bar">
+        <p className="list-bar__count" aria-live="polite">
+          {places.length} {places.length === 1 ? 'place' : 'places'}
+          {openNow && ' open now'}
+          {isLoading && ' · refreshing…'}
+        </p>
+        {sortControl}
+      </div>
       <ul className="list">
         {places.map((place, index) => (
           <li key={place.id}>
-            <PlaceCard place={place} onSelect={onSelect} badge={index === 0 ? badge : null} />
+            <PlaceCard
+              place={place}
+              number={index + 1}
+              badge={index === 0 ? badge : null}
+              saved={isSaved?.(place.id)}
+              onToggleSave={onToggleSave}
+              onSelect={onSelect}
+            />
           </li>
         ))}
       </ul>

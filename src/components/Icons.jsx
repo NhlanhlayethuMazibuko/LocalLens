@@ -36,6 +36,30 @@ export const ChevronLeftIcon = (p) => (
   </Icon>
 );
 
+export const ChevronRightIcon = (p) => (
+  <Icon size={16} {...p}>
+    <path d="m9 6 6 6-6 6" />
+  </Icon>
+);
+
+export const ArrowLeftIcon = (p) => (
+  <Icon size={16} {...p}>
+    <path d="M19 12H5M11 6l-6 6 6 6" />
+  </Icon>
+);
+
+export const DirectionsIcon = (p) => (
+  <Icon size={16} {...p}>
+    <path d="M12 3 5 20l7-4 7 4z" />
+  </Icon>
+);
+
+export const StarIcon = ({ size = 12, ...p }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...p}>
+    <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z" />
+  </svg>
+);
+
 export const PinIcon = (p) => (
   <Icon size={14} {...p}>
     <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />

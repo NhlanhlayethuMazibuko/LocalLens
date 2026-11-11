@@ -13,17 +13,19 @@ function escapeHtml(text) {
   );
 }
 
-function pinIcon(name, state) {
+const TICK =
+  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+
+// A round pin. It shows the place's number in the list, or a tick on Been there.
+function pinIcon(name, state, number, visited) {
+  const inside = visited ? TICK : (number ?? '<span class="pin__dot"></span>');
   return L.divIcon({
     className: 'pin-icon',
-    iconSize: [36, 44],
-    iconAnchor: [18, 44],
-    html: `<div class="pin pin--${state}">
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    html: `<div class="pin pin--${state}${visited ? ' pin--visited' : ''}">
+      ${inside}
       <span class="pin__label">${escapeHtml(name)}</span>
-      <svg width="36" height="44" viewBox="0 0 36 44" aria-hidden="true">
-        <path class="pin__body" d="M18 43C18 43 33 28.5 33 17A15 15 0 0 0 3 17C3 28.5 18 43 18 43Z"/>
-        <circle class="pin__dot" cx="18" cy="17" r="6"/>
-      </svg>
     </div>`,
   });
 }
@@ -53,7 +55,15 @@ function FlyTo({ target }) {
   return null;
 }
 
-export default function MapView({ initialCenter, places, selected, onSelect, onViewChange, flyTarget }) {
+export default function MapView({
+  initialCenter,
+  places,
+  selected,
+  onSelect,
+  onViewChange,
+  flyTarget,
+  visited,
+}) {
   const selectedIsListed = selected && places.some((p) => p.id === selected.id);
   const stateOf = (place) => (!selected ? 'normal' : place.id === selected.id ? 'selected' : 'dim');
 
@@ -69,11 +79,11 @@ export default function MapView({ initialCenter, places, selected, onSelect, onV
       <ViewWatcher onViewChange={onViewChange} />
       <FlyTo target={flyTarget} />
 
-      {places.map((place) => (
+      {places.map((place, index) => (
         <Marker
           key={place.id}
           position={[place.lat, place.lng]}
-          icon={pinIcon(place.name, stateOf(place))}
+          icon={pinIcon(place.name, stateOf(place), index + 1, visited)}
           zIndexOffset={selected?.id === place.id ? 1000 : 0}
           title={place.name}
           eventHandlers={{ click: () => onSelect(place) }}

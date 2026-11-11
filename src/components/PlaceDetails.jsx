@@ -1,14 +1,23 @@
-import { CheckIcon, ChevronLeftIcon, ClockIcon, GlobeIcon, HeartIcon, PhoneIcon, PinIcon } from './Icons.jsx';
-import { PlacePhoto, RatingLine } from './PlaceCard.jsx';
+import {
+  ArrowLeftIcon,
+  CheckIcon,
+  ClockIcon,
+  DirectionsIcon,
+  GlobeIcon,
+  HeartIcon,
+  PhoneIcon,
+  PinIcon,
+} from './Icons.jsx';
+import { MetaLine, PlacePhoto, StatusLine } from './PlaceCard.jsx';
 import Stars from './Stars.jsx';
-import { formatDistance, formatVisitDate } from '../lib/places.js';
+import { formatVisitDate } from '../lib/places.js';
 
 function InfoRow({ icon, label, value, href }) {
   return (
     <li className="info-row">
       <span className="info-row__icon">{icon}</span>
       <span className="info-row__text">
-        <span className="info-row__label">{label}</span>
+        <span className="visually-hidden">{label}: </span>
         {href ? (
           <a href={href} target="_blank" rel="noreferrer">
             {value}
@@ -19,6 +28,14 @@ function InfoRow({ icon, label, value, href }) {
       </span>
     </li>
   );
+}
+
+function initials(name) {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('');
 }
 
 function Review({ review }) {
@@ -36,15 +53,14 @@ function Review({ review }) {
           <img className="review__avatar" src={review.authorPhoto} alt="" referrerPolicy="no-referrer" />
         ) : (
           <span className="review__avatar" aria-hidden="true">
-            {review.author.charAt(0)}
+            {initials(review.author)}
           </span>
         )}
-        <div>
+        <div className="review__who">
           <div className="review__author">{author}</div>
-          <div className="review__meta">
-            {review.rating != null && <Stars rating={review.rating} size={12} />} {review.when}
-          </div>
+          <div className="review__when">{review.when}</div>
         </div>
+        {review.rating != null && <Stars rating={review.rating} size={12} />}
       </div>
       {review.text && <p className="review__text">{review.text}</p>}
     </li>
@@ -53,21 +69,13 @@ function Review({ review }) {
 
 export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, onToggleVisited, onBack }) {
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
-  const subtitle = [
-    place.category,
-    place.price,
-    place.stars && `${place.stars}★`,
-    formatDistance(place.distance),
-  ]
-    .filter(Boolean)
-    .join(' · ');
   const loading = !place.detailsLoaded;
   const missing = (text) => (loading ? 'Loading…' : text);
 
   return (
     <article className="details">
       <button type="button" className="details__back-link" onClick={onBack}>
-        <ChevronLeftIcon size={16} /> Back to the list
+        <ArrowLeftIcon /> Back to results
       </button>
 
       <div className="details__hero">
@@ -79,20 +87,20 @@ export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, on
         />
         <button
           type="button"
-          className="round-btn details__back-round"
+          className="icon-btn details__back-round"
           onClick={onBack}
-          aria-label="Back to the list"
+          aria-label="Back to results"
         >
-          <ChevronLeftIcon />
+          <ArrowLeftIcon size={18} />
         </button>
         <button
           type="button"
-          className={`round-btn details__save${saved ? ' is-saved' : ''}`}
+          className={`icon-btn details__save${saved ? ' is-saved' : ''}`}
           onClick={onToggleSave}
           aria-pressed={saved}
           aria-label={saved ? 'Remove from saved places' : 'Save this place'}
         >
-          <HeartIcon filled={saved} />
+          <HeartIcon filled={saved} size={18} />
         </button>
         {place.photoCredit && (
           <span className="details__credit">
@@ -110,20 +118,9 @@ export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, on
 
       <div className="details__body">
         <div className="details__title">
-          <h2>{place.name}</h2>
-          <RatingLine place={place} size={16} />
-          <p className="muted">{subtitle}</p>
-          <button
-            type="button"
-            className="toggle details__visited"
-            aria-pressed={Boolean(visitedAt)}
-            onClick={onToggleVisited}
-          >
-            <span className="toggle__check" aria-hidden="true">
-              {visitedAt && <CheckIcon size={14} />}
-            </span>
-            {visitedAt ? `Been here · ${formatVisitDate(visitedAt)}` : 'Been here?'}
-          </button>
+          <h1>{place.name}</h1>
+          <MetaLine place={place} />
+          <StatusLine place={place} />
           {place.chips.length > 0 && (
             <div className="chips">
               {place.chips.map((chip) => (
@@ -137,33 +134,46 @@ export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, on
 
         <div className="details__actions">
           <a className="btn btn--primary" href={directionsUrl} target="_blank" rel="noreferrer">
-            Take me there
+            <DirectionsIcon /> Directions
           </a>
-          {place.phoneHref ? (
+          {place.phoneHref && (
             <a className="btn btn--secondary" href={place.phoneHref}>
-              Call
+              <PhoneIcon size={16} /> Call
             </a>
-          ) : (
-            <span className="btn btn--secondary is-disabled" aria-disabled="true">
-              {loading ? 'Call' : 'No number listed'}
-            </span>
+          )}
+          {place.website && (
+            <a className="btn btn--secondary" href={place.website} target="_blank" rel="noreferrer">
+              <GlobeIcon size={16} /> Website
+            </a>
           )}
         </div>
 
+        <button type="button" className="visit" aria-pressed={Boolean(visitedAt)} onClick={onToggleVisited}>
+          <span className="visit__check" aria-hidden="true">
+            {visitedAt && <CheckIcon size={14} />}
+          </span>
+          <span className="visit__text">
+            <strong>{visitedAt ? "You've been here" : "I've been here"}</strong>
+            <span>
+              {visitedAt ? `Visited ${formatVisitDate(visitedAt)}` : 'Adds it to your Been there list'}
+            </span>
+          </span>
+        </button>
+
         <ul className="info">
           <InfoRow
-            icon={<PinIcon size={20} />}
+            icon={<PinIcon size={18} />}
             label="Address"
             value={place.address || missing('No address listed')}
           />
           <InfoRow
-            icon={<ClockIcon />}
+            icon={<ClockIcon size={18} />}
             label="Hours"
             value={place.allHours || missing('No hours listed. Call ahead?')}
           />
           {(place.phone || loading) && (
             <InfoRow
-              icon={<PhoneIcon />}
+              icon={<PhoneIcon size={18} />}
               label="Phone"
               value={place.phone || 'Loading…'}
               href={place.phoneHref}
@@ -171,7 +181,7 @@ export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, on
           )}
           {place.website && (
             <InfoRow
-              icon={<GlobeIcon />}
+              icon={<GlobeIcon size={18} />}
               label="Website"
               value={place.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
               href={place.website}
@@ -180,8 +190,10 @@ export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, on
         </ul>
 
         {(place.description || !place.googlePlace) && (
-          <section className="about">
-            <h3>The lowdown</h3>
+          <section className="section">
+            <div className="section__head">
+              <h2>About</h2>
+            </div>
             <p className="muted">
               {place.description ??
                 `${place.category}${place.address ? ` on ${place.address}` : ''}. Info comes from OpenStreetMap, the map anyone can edit, so if something's off, you can fix it there.`}
@@ -190,18 +202,20 @@ export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, on
         )}
 
         {place.reviews?.length > 0 && (
-          <section className="about">
-            <h3>What people are saying</h3>
+          <section className="section">
+            <div className="section__head">
+              <h2>Reviews</h2>
+              {place.googleMapsUrl && (
+                <a href={place.googleMapsUrl} target="_blank" rel="noreferrer">
+                  See all {(place.reviewCount ?? 0).toLocaleString()}
+                </a>
+              )}
+            </div>
             <ul className="reviews">
               {place.reviews.map((review) => (
                 <Review key={review.id} review={review} />
               ))}
             </ul>
-            {place.googleMapsUrl && (
-              <a className="details__more" href={place.googleMapsUrl} target="_blank" rel="noreferrer">
-                Read every review on Google Maps →
-              </a>
-            )}
           </section>
         )}
 

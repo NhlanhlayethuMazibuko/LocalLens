@@ -1,19 +1,24 @@
 :root {
-  --primary: #1e4d3a;
-  --primary-soft: #e3eee8;
-  --accent: #c2532b;
-  --accent-soft: #f8e6dd;
-  --bg-app: #f6f4ef;
+  --primary: #0b1f33;
+  --on-primary: #ffffff;
+  --logo-bg: #0b1f33;
+  --accent: #ff5a36;
+  --accent-soft: #ffede8;
+  --tint: #eef3fa;
+  --green: #16855b;
+  --green-soft: #e3f4ec;
+  --red: #c4321f;
+  --amber: #f5a524;
+  --bg-app: #f5f7fa;
   --bg-surface: #ffffff;
-  --text-primary: #1c1b18;
-  --text-muted: #67635a;
-  --text-on-primary: #ffffff;
-  --text-on-accent: #ffffff;
-  --border: #e3dfd5;
-  --rating: #c07d00;
-  --map-land: #edeae1;
-  --shadow: 0 2px 8px rgba(28, 27, 24, 0.1);
-  --pop: 4px 4px 0 var(--text-primary);
+  --field: #f1f3f6;
+  --text-primary: #0b1f33;
+  --text-muted: #5b6676;
+  --text-subtle: #8a93a2;
+  --border: #e4e8ee;
+  --map-land: #eef1f4;
+  --shadow-sm: 0 1px 2px rgba(11, 31, 51, 0.06), 0 2px 8px rgba(11, 31, 51, 0.08);
+  --shadow-md: 0 2px 4px rgba(11, 31, 51, 0.06), 0 8px 24px rgba(11, 31, 51, 0.12);
 
   --space-4: 4px;
   --space-8: 8px;
@@ -22,39 +27,43 @@
   --space-24: 24px;
   --space-32: 32px;
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --radius-full: 999px;
 
-  --font-display: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif;
-  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   color-scheme: light;
-  font-family: var(--font-body);
+  font-family: var(--font);
   font-size: 15px;
   line-height: 22px;
+  letter-spacing: -0.006em;
   color: var(--text-primary);
-  background: var(--bg-app);
+  background: var(--bg-surface);
   -webkit-font-smoothing: antialiased;
 }
 
 :root[data-theme='dark'] {
-  --primary: #86c9a8;
-  --primary-soft: #1d3329;
-  --accent: #f08a62;
-  --accent-soft: #3a2219;
-  --bg-app: #121311;
-  --bg-surface: #1b1d1a;
-  --text-primary: #edebe4;
-  --text-muted: #a29f95;
-  --text-on-primary: #0f1a14;
-  --text-on-accent: #1a0e08;
-  --border: #2e312c;
-  --rating: #f2b636;
-  --map-land: #1d201c;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --pop: 4px 4px 0 #000;
+  --primary: #eef2f7;
+  --on-primary: #0b1f33;
+  --logo-bg: #1b3350;
+  --accent: #ff6b4a;
+  --accent-soft: #3a1d15;
+  --tint: #16283c;
+  --green: #4cc38a;
+  --green-soft: #12301f;
+  --red: #f0705e;
+  --bg-app: #08131f;
+  --bg-surface: #0d1b2a;
+  --field: #16273a;
+  --text-primary: #eef2f7;
+  --text-muted: #a3aebd;
+  --text-subtle: #76839a;
+  --border: #213349;
+  --map-land: #0d1b2a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }
 
@@ -66,13 +75,14 @@
 }
 
 body {
-  background: var(--bg-app);
+  background: var(--bg-surface);
 }
 
 button,
 input,
 select {
   font: inherit;
+  letter-spacing: inherit;
   color: inherit;
 }
 
@@ -81,11 +91,11 @@ button {
 }
 
 a {
-  color: var(--primary);
+  color: inherit;
 }
 
 :focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 

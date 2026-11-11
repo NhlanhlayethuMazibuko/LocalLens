@@ -1,20 +1,17 @@
 .header {
+  grid-area: header;
   position: relative;
   z-index: 1100;
   display: grid;
-  grid-template-columns: 1fr auto minmax(240px, 360px) auto;
-  grid-template-areas: 'brand tagline search theme';
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'brand theme'
+    'search search';
   align-items: center;
   gap: var(--space-16);
-  padding: var(--space-12) var(--space-32);
-  min-height: 72px;
+  padding: var(--space-24) var(--space-24) var(--space-16);
   background: var(--bg-surface);
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border);
-}
-
-.header__name {
-  color: var(--primary);
+  border-right: 1px solid var(--border);
 }
 
 .header__brand {
@@ -25,36 +22,31 @@
 }
 
 .header__name {
-  font-family: var(--font-display);
-  font-size: 24px;
-  line-height: 28px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.header__tagline {
-  grid-area: tagline;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .header__theme {
   grid-area: theme;
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-  color: var(--text-primary);
 }
 
-.header__theme:hover {
-  border-color: var(--text-primary);
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  transition: background 0.15s;
+}
+
+.icon-btn:hover {
+  background: var(--field);
 }
 
 /* Search */
@@ -63,26 +55,23 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-8);
-  padding: var(--space-8) var(--space-12);
-  border: 1px solid var(--border);
+  gap: 10px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
-  background: var(--bg-app);
-  color: var(--text-primary);
+  background: var(--field);
 }
 
 .search:focus-within {
   border-color: var(--primary);
   background: var(--bg-surface);
-  box-shadow: 0 0 0 3px var(--primary-soft);
-}
-
-.search__icon {
-  color: var(--text-muted);
 }
 
 .search__icon {
   flex-shrink: 0;
+  color: var(--text-muted);
 }
 
 .search__input {
@@ -104,15 +93,15 @@
   right: 0;
   padding: var(--space-4);
   list-style: none;
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--bg-surface);
-  color: var(--text-primary);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
 }
 
 .search__note {
   padding: var(--space-8) var(--space-12);
+  font-size: 13px;
   color: var(--text-muted);
 }
 
@@ -127,29 +116,57 @@
   text-align: left;
 }
 
+.search__result strong {
+  font-weight: 500;
+}
+
 .search__result span {
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 13px;
+  line-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .search__result:hover {
-  background: var(--primary-soft);
+  background: var(--field);
+}
+
+/* Details view on desktop: just the brand row, like the design */
+@media (min-width: 768px) {
+  .app--details .header {
+    padding-bottom: var(--space-4);
+  }
+
+  .app--details .search {
+    display: none;
+  }
 }
 
 @media (max-width: 767px) {
   .header {
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      'brand theme'
-      'search search';
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'brand search theme';
     gap: var(--space-12);
-    padding: var(--space-16);
+    padding: var(--space-12) var(--space-16);
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
 
-  .header__tagline {
+  .header__name {
     display: none;
+  }
+
+  /* Place details cover the whole screen on a phone */
+  .app--details .header {
+    display: none;
+  }
+
+  .search {
+    height: 40px;
+  }
+
+  .search__input {
+    font-size: 16px;
   }
 }

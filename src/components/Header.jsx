@@ -12,17 +12,16 @@ export default function Header({ theme, onToggleTheme, onPickLocation }) {
         <Logo />
         <span className="header__name">LocalLens</span>
       </div>
-      <span className="header__tagline">Go where the locals go</span>
-      <SearchBox onPick={onPickLocation} />
       <button
         type="button"
-        className="header__theme"
+        className="icon-btn header__theme"
         onClick={onToggleTheme}
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         title={isDark ? 'Light mode' : 'Dark mode'}
       >
-        {isDark ? <SunIcon /> : <MoonIcon />}
+        {isDark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
       </button>
+      <SearchBox onPick={onPickLocation} />
     </header>
   );
 }
@@ -56,12 +55,12 @@ function SearchBox({ onPick }) {
 
   return (
     <form className="search" role="search" onSubmit={handleSubmit}>
-      <SearchIcon className="search__icon" />
+      <SearchIcon className="search__icon" size={18} />
       <input
         className="search__input"
         type="search"
         aria-label="Search for a city"
-        placeholder="Where to next?"
+        placeholder="Search a city or area"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => results.length > 0 && setOpen(true)}
