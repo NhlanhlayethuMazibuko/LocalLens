@@ -60,6 +60,12 @@ export const StarIcon = ({ size = 12, ...p }) => (
   </svg>
 );
 
+export const ShareIcon = (p) => (
+  <Icon size={16} {...p}>
+    <path d="M12 15V3M8 7l4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" />
+  </Icon>
+);
+
 export const PinIcon = (p) => (
   <Icon size={14} {...p}>
     <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />

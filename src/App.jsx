@@ -10,19 +10,22 @@ import { CheckIcon, HeartIcon, SearchIcon } from './components/Icons.jsx';
 import {
   useGoogleDetails,
   useGooglePlaces,
+  useGoogleSharedPlace,
   useOsmDetails,
   useOsmPlaces,
+  useOsmSharedPlace,
   useSavedPlaces,
   useTheme,
   useVisitedPlaces,
   useWeather,
 } from './lib/hooks.js';
 import { USE_GOOGLE } from './lib/config.js';
-import { distanceKm, isOpenNow } from './lib/places.js';
+import { distanceKm, isOpenNow, placeIdFromUrl, placeUrl } from './lib/places.js';
 import './App.css';
 
 const usePlaces = USE_GOOGLE ? useGooglePlaces : useOsmPlaces;
 const usePlaceDetails = USE_GOOGLE ? useGoogleDetails : useOsmDetails;
+const useSharedPlace = USE_GOOGLE ? useGoogleSharedPlace : useOsmSharedPlace;
 const PlacesMap = USE_GOOGLE ? GoogleMapView : MapView;
 
 const DEFAULT_CENTER = { lat: -33.9249, lng: 18.4241 };
@@ -95,13 +98,15 @@ export default function App() {
   const { savedPlaces, isSaved, toggleSaved, removeSaved } = useSavedPlaces();
   const { visitedPlaces, isVisited, addVisited, removeVisited } = useVisitedPlaces();
   const panelRef = useRef(null);
+  const [sharedId] = useState(placeIdFromUrl); // from a shared link, read once on load
+  const sharedPlace = useSharedPlace(sharedId);
 
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
       (position) => {
         const here = { lat: position.coords.latitude, lng: position.coords.longitude };
         setOrigin(here);
-        setFlyTarget({ ...here, zoom: 15 });
+        if (!sharedId) setFlyTarget({ ...here, zoom: 15 }); // a shared link decides where the map goes
       },
       () => {},
       { timeout: 8000 },
@@ -111,6 +116,19 @@ export default function App() {
   useEffect(() => {
     panelRef.current?.scrollTo({ top: 0 });
   }, [selected]);
+
+  // Open the place from a shared link once it has loaded.
+  useEffect(() => {
+    if (!sharedPlace) return;
+    setSelected(sharedPlace);
+    setFlyTarget({ lat: sharedPlace.lat, lng: sharedPlace.lng, zoom: 16 });
+  }, [sharedPlace]);
+
+  // Keep the address bar pointing at the open place, so it can be copied or refreshed.
+  useEffect(() => {
+    if (sharedId && !sharedPlace && !selected) return; // still loading the shared place
+    window.history.replaceState(null, '', placeUrl(selected?.id));
+  }, [selected, sharedId, sharedPlace]);
 
   const sortedPlaces = useMemo(() => {
     const shown = openNow ? places.filter((place) => isOpenNow(place) === true) : places;

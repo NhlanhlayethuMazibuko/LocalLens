@@ -103,6 +103,23 @@ export function isOpenNow(place, now = new Date()) {
   });
 }
 
+// A shared link looks like https://.../?place=<id>
+const PLACE_PARAM = 'place';
+const PLACE_ID = /^[\w-]+(\/\d+)?$/; // a Google place ID, or "node/123" from OpenStreetMap
+
+export function placeUrl(id) {
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.hash = '';
+  if (id) url.searchParams.set(PLACE_PARAM, id);
+  return url.toString();
+}
+
+export function placeIdFromUrl() {
+  const id = new URLSearchParams(window.location.search).get(PLACE_PARAM);
+  return id && PLACE_ID.test(id) ? id : null;
+}
+
 export function formatDistance(km) {
   if (km == null) return '';
   return km < 1 ? `${Math.round(km * 1000)} m away` : `${km.toFixed(1)} km away`;

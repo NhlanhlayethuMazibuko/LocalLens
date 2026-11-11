@@ -65,6 +65,18 @@ export async function fetchPlaces(type, bounds, signal) {
   return data.elements.map(toPlace).filter(Boolean);
 }
 
+// Used when someone opens a shared link. The ID looks like "node/123".
+export async function fetchPlaceById(id, signal) {
+  const match = /^(node|way|relation)\/(\d+)$/.exec(id);
+  if (!match) throw new Error('Not an OpenStreetMap ID');
+  const query = `[out:json][timeout:25];${match[1]}(${match[2]});out center;`;
+
+  const data = await askServers(new URLSearchParams({ data: query }), signal);
+  const place = data.elements.map(toPlace).find(Boolean);
+  if (!place) throw new Error('Place not found');
+  return place;
+}
+
 export async function searchLocations(text, signal) {
   const params = new URLSearchParams({ q: text, format: 'jsonv2', limit: '5', 'accept-language': 'en' });
   const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`, { signal });

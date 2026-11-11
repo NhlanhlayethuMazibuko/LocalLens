@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
-import { fetchPlaces, fetchWeather } from './api.js';
-import { loadDetails, searchNearby, searchRadiusKm, todaysHours } from './google.js';
+import { fetchPlaceById, fetchPlaces, fetchWeather } from './api.js';
+import { loadDetails, loadPlace, searchNearby, searchRadiusKm, todaysHours } from './google.js';
 import { distanceKm } from './places.js';
 
 const MIN_ZOOM = 13;
@@ -125,6 +125,43 @@ export function useGoogleDetails(place) {
 
 export function useOsmDetails(place) {
   return place && { ...place, detailsLoaded: true };
+}
+
+// Loads the place named in a shared link. Gives back null until it arrives,
+// and stays null if the link is broken, so the app just opens as normal.
+export function useGoogleSharedPlace(id) {
+  const placesLibrary = useMapsLibrary('places');
+  const [place, setPlace] = useState(null);
+
+  useEffect(() => {
+    if (!id || !placesLibrary) return;
+    let cancelled = false;
+    loadPlace(placesLibrary, id)
+      .then((found) => !cancelled && setPlace(found))
+      .catch((error) => console.error('Could not open the shared place:', error));
+    return () => {
+      cancelled = true;
+    };
+  }, [id, placesLibrary]);
+
+  return place;
+}
+
+export function useOsmSharedPlace(id) {
+  const [place, setPlace] = useState(null);
+
+  useEffect(() => {
+    if (!id) return;
+    const controller = new AbortController();
+    fetchPlaceById(id, controller.signal)
+      .then(setPlace)
+      .catch((error) => {
+        if (error.name !== 'AbortError') console.error('Could not open the shared place:', error);
+      });
+    return () => controller.abort();
+  }, [id]);
+
+  return place;
 }
 
 export function useWeather(center) {

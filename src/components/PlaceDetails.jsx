@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   ArrowLeftIcon,
   CheckIcon,
@@ -7,10 +8,11 @@ import {
   HeartIcon,
   PhoneIcon,
   PinIcon,
+  ShareIcon,
 } from './Icons.jsx';
 import { MetaLine, PlacePhoto, StatusLine } from './PlaceCard.jsx';
 import Stars from './Stars.jsx';
-import { formatVisitDate } from '../lib/places.js';
+import { formatVisitDate, placeUrl } from '../lib/places.js';
 
 function InfoRow({ icon, label, value, href }) {
   return (
@@ -27,6 +29,48 @@ function InfoRow({ icon, label, value, href }) {
         )}
       </span>
     </li>
+  );
+}
+
+// Phones get their own share sheet; everywhere else the link is copied.
+function ShareButton({ place }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  async function share() {
+    const url = placeUrl(place.id);
+    const onPhone = window.matchMedia('(pointer: coarse)').matches;
+    try {
+      if (navigator.share && onPhone) {
+        await navigator.share({ title: place.name, text: `${place.name} on LocalLens`, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+      }
+    } catch (error) {
+      // AbortError just means the share sheet was closed.
+      if (error.name !== 'AbortError') window.prompt('Copy this link:', url);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      className={`btn btn--secondary btn--icon${copied ? ' is-copied' : ''}`}
+      onClick={share}
+      aria-label="Share this place"
+      title="Share this place"
+    >
+      {copied ? <CheckIcon size={16} /> : <ShareIcon />}
+      <span className="share-note" role="status">
+        {copied && 'Link copied'}
+      </span>
+    </button>
   );
 }
 
@@ -142,10 +186,17 @@ export default function PlaceDetails({ place, saved, visitedAt, onToggleSave, on
             </a>
           )}
           {place.website && (
-            <a className="btn btn--secondary" href={place.website} target="_blank" rel="noreferrer">
-              <GlobeIcon size={16} /> Website
+            <a
+              className="btn btn--secondary btn--website"
+              href={place.website}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Website"
+            >
+              <GlobeIcon size={16} /> <span className="btn__label">Website</span>
             </a>
           )}
+          <ShareButton place={place} />
         </div>
 
         <button type="button" className="visit" aria-pressed={Boolean(visitedAt)} onClick={onToggleVisited}>

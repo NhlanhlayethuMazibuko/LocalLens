@@ -105,6 +105,13 @@ export function searchNearby(placesLibrary, type, view) {
   return searchCache.get(key);
 }
 
+// Used when someone opens a shared link: all we have is the place's ID.
+export async function loadPlace(placesLibrary, id) {
+  const { place } = await new placesLibrary.Place({ id }).fetchFields({ fields: LIST_FIELDS });
+  if (!place.location) throw new Error('Place has no location');
+  return fromGoogle(place);
+}
+
 const detailsCache = new Map();
 
 export function loadDetails(place) {

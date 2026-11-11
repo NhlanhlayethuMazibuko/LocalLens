@@ -734,6 +734,33 @@
   flex: 1;
 }
 
+.btn--icon {
+  position: relative;
+  width: 44px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn--icon.is-copied {
+  color: var(--green);
+}
+
+/* "Link copied" pops up above the share button */
+.share-note:not(:empty) {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: var(--shadow-sm);
+}
+
 /* "I've been here" box */
 .visit {
   display: flex;
@@ -1159,6 +1186,17 @@
 
   .pill--open {
     margin-left: 0;
+  }
+
+  /* Website shrinks to an icon so Directions keeps its label */
+  .btn--website {
+    width: 44px;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .btn--website .btn__label {
+    display: none;
   }
 
   .card--featured .card__photo {
