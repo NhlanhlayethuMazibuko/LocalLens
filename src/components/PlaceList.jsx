@@ -11,6 +11,7 @@ const MESSAGES = {
 // The first card gets a big spot, depending on how the list is sorted.
 const BADGES = {
   rating: 'Crowd favourite',
+  reviews: 'Most talked about',
   distance: 'Closest to you',
 };
 

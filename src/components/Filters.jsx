@@ -12,7 +12,20 @@ const SORTS = [
   ['name', 'Name (A–Z)'],
 ];
 
-const SORTS_WITH_RATING = [['rating', 'Top rated'], ...SORTS];
+const RATING_SORTS = [
+  ['rating', 'Top rated'],
+  ['reviews', 'Most reviewed'],
+];
+
+// Pass recentLabel on lists that have their own order, like Saved.
+export function SortSelect({ value, hasRatings, recentLabel, onChange }) {
+  const options = [
+    ...(recentLabel ? [['recent', recentLabel]] : []),
+    ...(hasRatings ? RATING_SORTS : []),
+    ...SORTS,
+  ];
+  return <Select label="Sort by" value={value} options={options} onChange={onChange} />;
+}
 
 export default function Filters({
   type,
@@ -26,12 +39,7 @@ export default function Filters({
   return (
     <div className="filters">
       <Select label="Type" value={type} options={TYPES} onChange={onTypeChange} />
-      <Select
-        label="Sort by"
-        value={sort}
-        options={hasRatings ? SORTS_WITH_RATING : SORTS}
-        onChange={onSortChange}
-      />
+      <SortSelect value={sort} hasRatings={hasRatings} onChange={onSortChange} />
       {hasRatings && (
         <button
           type="button"

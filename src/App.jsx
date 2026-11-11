@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Header from './components/Header.jsx';
-import Filters from './components/Filters.jsx';
+import Filters, { SortSelect } from './components/Filters.jsx';
 import PlaceList from './components/PlaceList.jsx';
 import PlaceDetails from './components/PlaceDetails.jsx';
 import MapView from './components/MapView.jsx';
@@ -36,10 +36,12 @@ const TITLES = {
 const MY_LISTS = {
   saved: {
     title: 'Your little black book',
+    recentLabel: 'Recently saved',
     emptyText: "Nothing saved yet. Tap the heart on any place and it'll wait for you here.",
   },
   visited: {
     title: 'Been there, done that',
+    recentLabel: 'Recently visited',
     emptyText: 'Nowhere ticked off yet. Open a place and tap Been here once you have gone.',
   },
 };
@@ -47,14 +49,21 @@ const MY_LISTS = {
 const SORTERS = {
   distance: (a, b) => a.distance - b.distance,
   name: (a, b) => a.name.localeCompare(b.name),
-  rating: (a, b) => (b.rating ?? 0) - (a.rating ?? 0) || b.reviewCount - a.reviewCount,
+  rating: (a, b) => (b.rating ?? 0) - (a.rating ?? 0) || reviewCount(b) - reviewCount(a),
+  reviews: (a, b) => reviewCount(b) - reviewCount(a) || (b.rating ?? 0) - (a.rating ?? 0),
+  recent: () => 0, // saved and visited lists are already stored newest first
 };
+
+function reviewCount(place) {
+  return place.reviewCount ?? 0;
+}
 
 export default function App() {
   const [theme, toggleTheme] = useTheme();
   const [type, setType] = useState('restaurants');
   const [sort, setSort] = useState(USE_GOOGLE ? 'rating' : 'distance');
-  const [tab, setTab] = useState('explore'); // explore | saved
+  const [listSort, setListSort] = useState('recent'); // for Saved and Been there
+  const [tab, setTab] = useState('explore'); // explore | saved | visited
   const [openNow, setOpenNow] = useState(false);
   const [view, setView] = useState(null);
   const [origin, setOrigin] = useState(DEFAULT_CENTER);
@@ -94,8 +103,8 @@ export default function App() {
     if (!list) return null;
     const source = tab === 'saved' ? savedPlaces : visitedPlaces;
     const places = source.map((place) => ({ ...place, distance: distanceKm(origin, place) }));
-    return { ...list, places };
-  }, [tab, savedPlaces, visitedPlaces, origin]);
+    return { ...list, places: places.sort(SORTERS[listSort]) };
+  }, [tab, savedPlaces, visitedPlaces, origin, listSort]);
 
   const shownPlaces = myList ? myList.places : sortedPlaces;
   const selectedVisit = selected && visitedPlaces.find((p) => p.id === selected.id);
@@ -146,6 +155,16 @@ export default function App() {
               {myList ? (
                 <>
                   <h1 className="panel__title">{myList.title}</h1>
+                  {myList.places.length > 1 && (
+                    <div className="filters">
+                      <SortSelect
+                        value={listSort}
+                        hasRatings={USE_GOOGLE}
+                        recentLabel={myList.recentLabel}
+                        onChange={setListSort}
+                      />
+                    </div>
+                  )}
                   <PlaceList
                     places={myList.places}
                     status="ready"
