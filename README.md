@@ -44,7 +44,6 @@ One clean screen that answers "what's good near me?" in a few seconds:
 - **Leaflet** and **OpenStreetMap** for the keyless fallback map
 - **Overpass API**, **Nominatim** and **Open-Meteo** for free place, search and weather data
 - **Plain CSS** with design tokens (no UI framework)
-- **Prettier** for consistent formatting
 - **Figma** for the design system and screens, designed before writing code
 
 ---
