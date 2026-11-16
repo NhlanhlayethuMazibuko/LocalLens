@@ -10,7 +10,7 @@ Finding somewhere good to eat, stay or visit usually means juggling a maps app, 
 
 ## The solution
 
-One clean screen that answers "what's good near me?" in a few seconds:
+One clean screen that answers "what is good near me?" in a few seconds:
 
 - **Map and list in sync.** Every place is both a pin and a card. Selecting one highlights the other.
 - **Decide fast.** Cards show a photo, star rating, review count, price level, distance and today's hours. The best match is featured at the top.
