@@ -87,6 +87,9 @@ Open http://localhost:5173.
 4. Restart `npm run dev`.
 
 
+   Netlify Link: https://locallens1.netlify.app
+
+
 ## About
 
 Designed and built by **Nhlanhla Mazibuko**. Built with AI pair-programming (Claude) as a learning project. I directed the product and design decisions and reviewed and tested the code.
