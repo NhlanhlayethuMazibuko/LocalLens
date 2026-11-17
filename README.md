@@ -1,3 +1,5 @@
+   Netlify Link: https://locallens1.netlify.app
+   
 # LocalLens
 
 **Find the best places around you on one map, with photos, ratings and directions, so you can decide where to go in seconds.**
@@ -87,7 +89,7 @@ Open http://localhost:5173.
 4. Restart `npm run dev`.
 
 
-   Netlify Link: https://locallens1.netlify.app
+
 
 
 ## About
